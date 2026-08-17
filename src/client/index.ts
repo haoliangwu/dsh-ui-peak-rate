@@ -3,8 +3,12 @@
  * `conversation.input.right` list slot (session scope). The badge shows in
  * the composer's trailing row, just left of the model trigger, while the
  * session's current model provider (read through the shared model directory
- * owned by ui-model-selection) is in the configured list and the UTC time is
- * inside a peak window. Export discipline: packages/client/AGENTS.md.
+ * owned by ui-model-selection) is in the configured provider list and the
+ * UTC time is inside a peak window. Export discipline: packages/client/AGENTS.md.
+ *
+ * The provider list is hardcoded below: no transport carries host config
+ * into the browser context, so a host-side Config field would be dead code.
+ * Add a real client RPC when a second peak-priced provider appears.
  */
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
@@ -28,8 +32,15 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 /** Dictionary namespace owned by this plugin. */
 const NS = 'peak'
 
-/** Required services: the contribution registry, locale, the model directory, and the host Config carrier. */
-export const inject = ['slots', 'locale', 'modelDirectories', 'peakRateConfig']
+/**
+ * Provider ids whose sessions show the peak badge. Hardcoded: no host-config
+ * transport into the browser. Add an RPC when a second peak-priced provider
+ * needs to be configured from a profile.
+ */
+const PROVIDERS: readonly string[] = ['deepseek-official']
+
+/** Required services: the contribution registry, locale, and the model directory. */
+export const inject = ['slots', 'locale', 'modelDirectories']
 
 /**
  * Client plugin body: register the `peak` dictionaries and the composer's
@@ -45,7 +56,7 @@ export function apply(ctx: ClientContext): void {
     locale: NS,
     inject: sessionId => ({
       directory: ctx.modelDirectories.directoryFor(sessionId).store,
-      providers: ctx.peakRateConfig.providers,
+      providers: PROVIDERS,
     }),
   }, PeakRateBadge))
 }
