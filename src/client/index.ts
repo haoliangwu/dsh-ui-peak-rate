@@ -6,10 +6,11 @@
  * owned by ui-model-selection) is in the configured provider list and the
  * UTC time is inside a peak window. Export discipline: packages/client/AGENTS.md.
  *
- * The provider list is fetched once from the host half through the Connection
- * RPC channel `/peak-rate` endpoint `providers` (host reads schemastery Config
- * from the profile's cordis.patch.yml). The list arrives asynchronously; the
- * badge stays hidden until the fetch settles, then re-renders when it does.
+ * The peak-rate policy (providers, peak windows, multiplier) is fetched once
+ * from the host half through the Connection RPC channel `/peak-rate` endpoint
+ * `config` (host reads schemastery Config from the profile's
+ * cordis.patch.yml). The policy arrives asynchronously; the badge stays
+ * hidden until the fetch settles, then re-renders when it does.
  */
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
@@ -19,7 +20,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 // Type-only: pulls the ui-model-selection directory types + ctx.modelDirectories merge.
 import type {} from '@deepseek-ai/dsh-client-ui-model-selection/client'
 import type { RpcResult } from '@deepseek-ai/dsh-host-apiproxy/api'
-import { PeakRateBadge, type ProvidersSource } from './PeakRateBadge.tsx'
+import { PeakRateBadge, type ConfigSource, type PluginConfig } from './PeakRateBadge.tsx'
 import { en, zh, type PeakKey } from './locales.ts'
 
 export type { PeakKey } from './locales.ts'
@@ -37,12 +38,14 @@ const NS = 'peak'
 /** RPC channel owned by the host half of this plugin. */
 const CHANNEL = '/peak-rate'
 
-/** Endpoint under {@link CHANNEL} returning the configured provider list. */
-const ENDPOINT_PROVIDERS = 'providers'
+/** Endpoint under {@link CHANNEL} returning the configured peak-rate policy. */
+const ENDPOINT_CONFIG = 'config'
 
-/** Host response payload for {@link ENDPOINT_PROVIDERS}. */
-interface ProvidersResponse {
+/** Host response payload for {@link ENDPOINT_CONFIG}. */
+interface ConfigResponse {
   readonly providers: readonly string[]
+  readonly peakWindows: readonly (readonly [number, number])[]
+  readonly multiplier: number
 }
 
 /** Required services: the contribution registry, locale, the model directory, and the Connection RPC carrier. */
@@ -50,35 +53,35 @@ export const inject = ['slots', 'locale', 'modelDirectories', 'connection']
 
 /**
  * Client plugin body: register the `peak` dictionaries and the composer's
- * trailing input-slot entry. Fetch the configured provider list once from the
- * host half through the Connection RPC channel; the badge stays hidden until
- * the fetch settles.
+ * trailing input-slot entry. Fetch the configured peak-rate policy once from
+ * the host half through the Connection RPC channel; the badge stays hidden
+ * until the fetch settles.
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'client-ui-peak-rate: dictionaries')
 
-  // Reactive provider list: empty until the host RPC settles, then published
-  // once. The badge component subscribes through useSyncExternalStore.
-  let providers: readonly string[] = []
+  // Reactive peak-rate policy: empty until the host RPC settles, then
+  // published once. The badge component subscribes through useSyncExternalStore.
+  let policy: PluginConfig = { providers: [], peakWindows: [], multiplier: 0 }
   const listeners = new Set<() => void>()
-  const providersSource: ProvidersSource = {
-    getSnapshot: () => providers,
+  const configSource: ConfigSource = {
+    getSnapshot: () => policy,
     subscribe: (listener) => {
       listeners.add(listener)
       return () => { listeners.delete(listener) }
     },
   }
-  const publish = (next: readonly string[]): void => {
-    if (Object.is(next, providers)) return
-    providers = next
+  const publish = (next: PluginConfig): void => {
+    if (Object.is(next, policy)) return
+    policy = next
     for (const listener of [...listeners]) listener()
   }
 
   ctx.effect(async () => {
-    const result = await ctx.connection.rpc.call(CHANNEL, ENDPOINT_PROVIDERS, {}) as RpcResult<ProvidersResponse>
-    if (result.ok) publish(result.value.providers)
-  }, 'client-ui-peak-rate: fetch providers')
+    const result = await ctx.connection.rpc.call(CHANNEL, ENDPOINT_CONFIG, {}) as RpcResult<ConfigResponse>
+    if (result.ok) publish(result.value)
+  }, 'client-ui-peak-rate: fetch config')
 
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register({
     name: 'conversation.input.right',
@@ -86,7 +89,7 @@ export function apply(ctx: ClientContext): void {
     locale: NS,
     inject: sessionId => ({
       directory: ctx.modelDirectories.directoryFor(sessionId).store,
-      providers: providersSource,
+      config: configSource,
     }),
   }, PeakRateBadge))
 }
