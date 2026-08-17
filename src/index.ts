@@ -12,7 +12,7 @@ import type { RpcResult } from '@deepseek-ai/dsh-host-apiproxy/api'
 import z from '@deepseek-ai/schemastery'
 
 /** Cordis plugin name. */
-export const name = 'client-peak-rate'
+export const name = 'client-ui-peak-rate'
 
 /** Required services: the host-side Connection RPC registry. */
 export const inject = ['connection']

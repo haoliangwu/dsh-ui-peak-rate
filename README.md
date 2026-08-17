@@ -1,4 +1,4 @@
-<h1 align="center">dsh-client-peak-rate</h1>
+<h1 align="center">dsh-ui-peak-rate</h1>
 
 <p align="center">DSH web composer 🔥 2× peak-rate badge — shows when the session's model selection matches a DeepSeek peak-rate route during DeepSeek peak hours.</p>
 
@@ -14,7 +14,7 @@ Otherwise the badge is hidden entirely — no layout cost.
 ## Install
 
 ```sh
-dsh plugin --profile web add github:haoliangwu/dsh-client-peak-rate
+dsh plugin --profile web add github:haoliangwu/dsh-ui-peak-rate
 ```
 
 Built `lib/` is committed, so the git install is one line — no `prepare` script, no `allowBuilds` permission. Restart `dsh --profile web` after install (bundle layer stacks compose at boot).
@@ -24,7 +24,7 @@ Built `lib/` is committed, so the git install is one line — no `prepare` scrip
 The provider list defaults to `['deepseek-official']`. Override it in your profile's `cordis.patch.yml` (`~/.dsh/profiles/web/cordis.patch.yml`):
 
 ```yaml
-- id: peak-rate
+- id: dsh-ui-peak-rate
   config:
     providers:
       - deepseek-official
@@ -33,7 +33,7 @@ The provider list defaults to `['deepseek-official']`. Override it in your profi
 Disable the badge entirely:
 
 ```yaml
-- id: peak-rate
+- id: dsh-ui-peak-rate
   disabled: true
 ```
 

@@ -1,5 +1,5 @@
 {
-  "name": "dsh-client-peak-rate",
+  "name": "dsh-ui-peak-rate",
   "version": "0.1.0",
   "description": "DSH web composer peak-rate badge: shows 🔥 2× when the session's model provider matches a configurable list during DeepSeek peak hours",
   "type": "module",

@@ -1,16 +1,16 @@
 /**
- * Package-owned invariant companion for `@deepseek-ai/dsh-client-peak-rate`.
- * @module @deepseek-ai/dsh-client-peak-rate/invariant
+ * Package-owned invariant companion for `@deepseek-ai/dsh-ui-peak-rate`.
+ * @module @deepseek-ai/dsh-ui-peak-rate/invariant
  */
 
 /* jscpd:ignore-start */
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = 'dsh-client-peak-rate'
+const PACKAGE_NAME = 'dsh-ui-peak-rate'
 
 /** Cordis companion plugin name. */
-export const name = 'client-peak-rate-invariant'
+export const name = 'client-ui-peak-rate-invariant'
 /** Service required before the companion can reserve package ownership. */
 export const inject = ['invariants']
 

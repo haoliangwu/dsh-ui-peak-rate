@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'tsdown'
 import { transform } from 'lightningcss'
 
-const ID = 'dsh-client-peak-rate'
+const ID = 'dsh-ui-peak-rate'
 
 /** Browser platform modules the shell seeds into the frozen module table. */
 const PLATFORM_MODULES = [

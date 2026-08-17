@@ -56,7 +56,7 @@ export const inject = ['slots', 'locale', 'modelDirectories', 'connection']
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'client-peak-rate: dictionaries')
+  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'client-ui-peak-rate: dictionaries')
 
   // Reactive provider list: empty until the host RPC settles, then published
   // once. The badge component subscribes through useSyncExternalStore.
@@ -78,11 +78,11 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(async () => {
     const result = await ctx.connection.rpc.call(CHANNEL, ENDPOINT_PROVIDERS, {}) as RpcResult<ProvidersResponse>
     if (result.ok) publish(result.value.providers)
-  }, 'client-peak-rate: fetch providers')
+  }, 'client-ui-peak-rate: fetch providers')
 
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register({
     name: 'conversation.input.right',
-    id: 'peak-rate',
+    id: 'dsh-ui-peak-rate',
     locale: NS,
     inject: sessionId => ({
       directory: ctx.modelDirectories.directoryFor(sessionId).store,
