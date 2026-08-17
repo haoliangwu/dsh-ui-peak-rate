@@ -1,0 +1,5 @@
+# dsh-client-peak-rate bundle: inserts the peak-rate client plugin row.
+# Applied when a profile lists this bundle in dsh.profile.bundles.
+- insert:
+    - id: peak-rate
+      name: dsh-client-peak-rate
