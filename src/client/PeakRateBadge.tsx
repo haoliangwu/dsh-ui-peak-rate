@@ -4,9 +4,10 @@
 // it is hidden entirely (null) otherwise — off-peak, unmatched selection, or
 // before the host has reported a current selection (`state.current === null`).
 //
-// Match rule: provider is in the configured list (host RPC) OR the model id
-// contains "deepseek" (case-insensitive). The model-id fallback covers routes
-// that advertise a DeepSeek model through a non-deepseek provider id.
+// Match rule: provider is in the configured list (host RPC) AND the model id
+// contains "deepseek" (case-insensitive). Both conditions must hold; the
+// model-id check narrows the provider list so a non-DeepSeek model routed
+// through a listed provider does not trigger the badge.
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
@@ -67,7 +68,7 @@ export function PeakRateBadge({ directory, providers, t }: PeakRateBadgeProps) {
   const { provider, model } = state.current
   const providerMatch = providerList.includes(provider)
   const modelMatch = model.toLowerCase().includes(MODEL_ID_MARKER)
-  if (!providerMatch && !modelMatch) return null
+  if (!(providerMatch && modelMatch)) return null
   if (!peak) return null
   return <span className={css.badge} title={t('title')}>🔥 2×</span>
 }

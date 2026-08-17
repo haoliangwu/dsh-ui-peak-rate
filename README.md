@@ -41,12 +41,12 @@ The host half reads `Config.providers` (schemastery) and exposes it to the brows
 
 ## Match rule
 
-The badge shows when the session's current model selection satisfies **either** of:
+The badge shows when the session's current model selection satisfies **both** of:
 
-- `state.current.provider ∈ Config.providers` (provider match, default `['deepseek-official']`), OR
-- `state.current.model` contains `deepseek` (case-insensitive model-id fallback).
+- `state.current.provider ∈ Config.providers` (provider match, default `['deepseek-official']`), AND
+- `state.current.model` contains `deepseek` (case-insensitive).
 
-The model-id fallback covers routes that advertise a DeepSeek model through a non-deepseek provider id.
+The model-id check narrows the provider list so a non-DeepSeek model routed through a listed provider does not trigger the badge. To match a provider whose model ids do not contain `deepseek`, neither condition holds and the badge stays hidden — extend `Config.providers` only when the route actually serves DeepSeek peak-priced models.
 
 ## How it works
 
