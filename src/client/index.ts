@@ -4,7 +4,9 @@
  * the composer's trailing row, just left of the model trigger, while the
  * session's current model provider (read through the shared model directory
  * owned by ui-model-selection) is in the configured provider list and the
- * UTC time is inside a peak window. Export discipline: packages/client/AGENTS.md.
+ * current time is peak-priced (weekday inside a peak window; weekends are
+ * all-day off-peak per the 2026-08-23 billing rule). Export discipline:
+ * packages/client/AGENTS.md.
  *
  * The peak-rate policy (providers, peak windows, multiplier) is fetched once
  * from the host half through the Connection RPC channel `/peak-rate` endpoint

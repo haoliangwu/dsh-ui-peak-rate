@@ -1,8 +1,12 @@
 // PeakRateBadge: the 🔥 {multiplier}× pill in the composer's trailing input
 // slot. It shows only while the session's current model selection matches the
-// DeepSeek peak-rate policy AND the current UTC time is inside a peak window;
-// it is hidden entirely (null) otherwise — off-peak, unmatched selection, or
-// before the host has reported a current selection (`state.current === null`).
+// DeepSeek peak-rate policy AND the current time is peak-priced; it is hidden
+// entirely (null) otherwise — off-peak, unmatched selection, or before the
+// host has reported a current selection (`state.current === null`).
+//
+// Peak pricing follows the billing rule effective 2026-08-23: weekdays
+// (Monday–Friday) keep the configured peak windows; weekends (Saturday and
+// Sunday, Beijing time) are all-day off-peak, so the badge never shows then.
 //
 // Match rule: provider is in the configured list (host RPC) AND the model id
 // contains "deepseek" (case-insensitive). Both conditions must hold; the
@@ -13,7 +17,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 import type { ModelDirectoryState } from '@deepseek-ai/dsh-client-ui-model-selection/client'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
-import { formatWindows, isPeak } from './peak-rate.ts'
+import { formatWindows, isPeakRate } from './peak-rate.ts'
 import css from './PeakRateBadge.module.css'
 
 /** How often the peak/off-peak window re-evaluates, in milliseconds. */
@@ -67,10 +71,10 @@ export function PeakRateBadge({ directory, config, t }: PeakRateBadgeProps) {
     fn => config.subscribe(fn),
     () => config.getSnapshot(),
   )
-  const [peak, setPeak] = useState(() => isPeak(new Date(), policy.peakWindows))
+  const [peak, setPeak] = useState(() => isPeakRate(new Date(), policy.peakWindows))
   useEffect(() => {
-    setPeak(isPeak(new Date(), policy.peakWindows))
-    const id = setInterval(() => { setPeak(isPeak(new Date(), policy.peakWindows)) }, REFRESH_INTERVAL_MS)
+    setPeak(isPeakRate(new Date(), policy.peakWindows))
+    const id = setInterval(() => { setPeak(isPeakRate(new Date(), policy.peakWindows)) }, REFRESH_INTERVAL_MS)
     return () => { clearInterval(id) }
   }, [policy.peakWindows])
   if (state.current === null) return null
